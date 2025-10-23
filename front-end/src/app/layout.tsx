@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Music PlayTube",
-  description: "Music PlayTube",
+  title: "MusicPlay",
+  description: "MusicPlay is a leading online music streaming platform that lets you listen to millions of songs anytime, anywhere. Discover trending tracks, create personalized playlists, and enjoy high-quality music for free. Start streaming your favorite artists and genres with MusicPlay today.",
 };
 
 export default async function RootLayout({
