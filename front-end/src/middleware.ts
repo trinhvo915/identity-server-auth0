@@ -1,9 +1,9 @@
-import { withAuth } from "next-auth/middleware"
+import {NextRequestWithAuth, withAuth} from "next-auth/middleware"
 import { NextResponse } from "next/server"
-import { getRedirectPath, isPublicRoute } from "@/core/utils/configs/auth-config"
+import { getRedirectPath, isPublicRoute } from "@/core/utils/configs/router-config"
 
 export default withAuth(
-  function middleware(req) {
+  function middleware(req : NextRequestWithAuth) {
     const token = req.nextauth.token;
     const path = req.nextUrl.pathname;
 

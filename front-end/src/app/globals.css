@@ -122,4 +122,49 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Smooth transitions for theme changes */
+  :root {
+    transition: background-color 0.3s ease-in-out,
+                color 0.3s ease-in-out,
+                border-color 0.3s ease-in-out;
+  }
+
+  * {
+    transition-property: color, background-color, border-color,
+                        text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+}
+
+/* Dark mode adjustments for color themes */
+.dark[data-color-theme="purple"] {
+  --primary: oklch(0.65 0.25 290);
+  --accent: oklch(0.25 0.08 290);
+}
+
+.dark[data-color-theme="blue"] {
+  --primary: oklch(0.65 0.22 240);
+  --accent: oklch(0.25 0.08 240);
+}
+
+.dark[data-color-theme="green"] {
+  --primary: oklch(0.65 0.20 150);
+  --accent: oklch(0.25 0.08 150);
+}
+
+.dark[data-color-theme="orange"] {
+  --primary: oklch(0.70 0.22 40);
+  --accent: oklch(0.25 0.08 40);
+}
+
+.dark[data-color-theme="rose"] {
+  --primary: oklch(0.68 0.24 10);
+  --accent: oklch(0.25 0.08 10);
+}
+
+.dark[data-color-theme="cyan"] {
+  --primary: oklch(0.70 0.20 200);
+  --accent: oklch(0.25 0.08 200);
 }
