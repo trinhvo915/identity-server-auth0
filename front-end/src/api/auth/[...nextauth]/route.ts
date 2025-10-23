@@ -10,25 +10,33 @@ export const authOptions: NextAuthOptions = {
             clientId: process.env.AUTH0_CLIENT_ID!,
             clientSecret: process.env.AUTH0_CLIENT_SECRET!,
             issuer: process.env.AUTH0_ISSUER,
-            authorization: {params: {scope: 'openid profile'}},
+            authorization: {params: {scope: 'openid profile email'}},
         })
     ],
     callbacks: {
-        async jwt({token, profile, account}) {
-            if (profile) {
-                token.username = profile.name
+        async jwt({token, profile, account, user}) {
+            // Initial sign in
+            if (account && profile) {
+                token.id = profile.sub || user?.id || '';
+
+                // TODO: Get role from Auth0 user metadata or database
+                // For now, hard code role as ADMIN
+                token.role = 'ADMIN';
             }
-            if (account) {
-                token.access_token = account.access_token
-            }
+
             return token;
         },
         async session({session, token}) {
-            if (token) {
-                // session.user?.name = token.username
+            if (token && session.user) {
+                session.user.id = token.id as string;
+                session.user.role = token.role as string;
             }
             return session;
         }
+    },
+    pages: {
+        signIn: '/api/auth/signin',
+        error: '/auth/error',
     }
 }
 
