@@ -1,4 +1,4 @@
-package idenity.server.auth0;
+package identity.server.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
