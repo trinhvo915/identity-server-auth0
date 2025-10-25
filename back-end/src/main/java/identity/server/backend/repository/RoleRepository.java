@@ -24,8 +24,10 @@ public interface RoleRepository extends JpaRepository<Role, UUID> {
      * @param pageable Pagination and sorting info
      * @return Page of roles
      */
-    @Query("SELECT r FROM Role r WHERE " +
-           "(LOWER(r.code) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "LOWER(r.description) LIKE LOWER(CONCAT('%', :search, '%')))")
+    @Query("""
+       SELECT r FROM Role r
+       WHERE (:search IS NULL OR LOWER(r.code) LIKE LOWER(CONCAT('%', :search, '%')) 
+              OR LOWER(r.description) LIKE LOWER(CONCAT('%', :search, '%')))
+       """)
     Page<Role> searchRoles(@Param("search") String search, Pageable pageable);
 }

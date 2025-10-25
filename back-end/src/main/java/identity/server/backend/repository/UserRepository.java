@@ -24,4 +24,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT u FROM User u WHERE u.id = :id")
     Optional<User> findByIdWithLock(@Param("id") UUID id);
+
+    /**
+     * Find user by Auth0 user ID with their roles
+     * Uses JOIN FETCH to eagerly load roles in a single query
+     *
+     * @param auth0UserId Auth0 user ID from JWT sub claim
+     * @return Optional User with roles loaded
+     */
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.auth0UserId = :auth0UserId")
+    Optional<User> findByAuth0UserIdWithRoles(@Param("auth0UserId") String auth0UserId);
 }

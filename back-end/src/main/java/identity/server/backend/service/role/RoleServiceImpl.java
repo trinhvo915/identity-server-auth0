@@ -15,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -37,7 +36,6 @@ public class RoleServiceImpl implements IRoleService {
         }
 
         Role role = Role.builder()
-                .id(UUID.randomUUID())
                 .code(upperCaseCode)
                 .description(request.getDescription())
                 .build();
@@ -61,8 +59,7 @@ public class RoleServiceImpl implements IRoleService {
         }
 
         role.setDescription(request.getDescription());
-        role.setLastModifiedBy("SYSTEM"); // TODO: Get from SecurityContext
-        role.setLastModifiedDate(Instant.now());
+        // lastModifiedBy and lastModifiedDate are automatically set by JPA Auditing
 
         Role updatedRole = roleRepository.save(role);
         log.info("Role description updated successfully for ID: {}", id);
@@ -110,7 +107,11 @@ public class RoleServiceImpl implements IRoleService {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         String searchTerm = roleFilter.getSearchTerm();
-        Page<Role> roles = roleRepository.searchRoles(searchTerm.trim(), pageable);
+        String normalizedSearch = (searchTerm != null && !searchTerm.isBlank())
+            ? searchTerm.trim()
+            : null;
+
+        Page<Role> roles = roleRepository.searchRoles(normalizedSearch, pageable);
 
         return roles.map(RoleResponse::mapToResponse);
     }
@@ -128,8 +129,7 @@ public class RoleServiceImpl implements IRoleService {
         }
 
         role.setDelete(true);
-        role.setLastModifiedBy("SYSTEM"); // TODO: Get from SecurityContext
-        role.setLastModifiedDate(Instant.now());
+        // lastModifiedBy and lastModifiedDate are automatically set by JPA Auditing
 
         roleRepository.save(role);
         log.info("Role soft deleted successfully: {}", id);

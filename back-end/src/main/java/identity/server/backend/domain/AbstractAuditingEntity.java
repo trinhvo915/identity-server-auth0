@@ -35,20 +35,19 @@ public abstract class AbstractAuditingEntity<T> implements Serializable {
     @Column(name = "created_by", nullable = false, length = 50, updatable = false)
     private String createdBy;
 
-    @Builder.Default
     @CreatedDate
-    @Column(name = "created_date", updatable = true)
-    private Instant createdDate = Instant.now();
+    @Column(name = "created_date", updatable = false)
+    private Instant createdDate;
 
     @LastModifiedBy
     @Column(name = "last_modified_by", length = 50)
     private String lastModifiedBy;
 
-    @Builder.Default
     @LastModifiedDate
     @Column(name = "last_modified_date")
-    private Instant lastModifiedDate = Instant.now();
+    private Instant lastModifiedDate;
 
+    @Builder.Default
     @Column(name = "is_delete", columnDefinition = "boolean default false")
-    private boolean isDelete;
+    private boolean isDelete = false;
 }
