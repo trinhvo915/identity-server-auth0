@@ -12,7 +12,12 @@ export const authOptions: NextAuthOptions = {
             clientId: process.env.AUTH0_CLIENT_ID!,
             clientSecret: process.env.AUTH0_CLIENT_SECRET!,
             issuer: process.env.AUTH0_ISSUER,
-            authorization: {params: {scope: 'openid profile email'}},
+            authorization: {
+                params: {
+                    scope: 'openid profile email',
+                    audience: process.env.AUTH0_AUDIENCE || 'https://api.audience.autho.com'
+                }
+            },
         })
     ],
     callbacks: {
@@ -28,6 +33,7 @@ export const authOptions: NextAuthOptions = {
 
                 // Store id_token for federated logout
                 if (account.id_token) {
+                    // console.log("account.id_token : ", account.id_token)
                     token.idToken = account.id_token;
                 }
 
