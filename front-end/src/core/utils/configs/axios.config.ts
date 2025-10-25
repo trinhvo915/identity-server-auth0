@@ -7,12 +7,17 @@ export interface ApiError {
 }
 
 /**
- * Get access token from session
+ * Get access token from localStorage
  * This function should be called in client components
  */
 const getAccessToken = (): string | null => {
   if (typeof window === 'undefined') return null;
 
+  // Try localStorage first (set by useAuthToken hook)
+  const token = localStorage.getItem('access_token');
+  if (token) return token;
+
+  // Fallback to sessionStorage for backward compatibility
   return sessionStorage.getItem('accessToken');
 };
 

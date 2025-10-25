@@ -9,6 +9,7 @@ import identity.server.backend.service.role.IRoleService;
 import identity.server.backend.model.request.role.CreateRoleRequest;
 import identity.server.backend.model.response.role.RoleResponse;
 import identity.server.backend.model.request.role.UpdateRoleRequest;
+import identity.server.backend.model.request.role.BulkDeleteRolesRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -79,6 +81,8 @@ public class RoleController {
     )
     public ResponseEntity<ResponseData> searchRoles(
             @Parameter(description = "Search keyword (searches in code and description)")
+            @RequestParam(required = false) Boolean status,
+            @Parameter(description = "Search keyword (searches in code and description)")
             @RequestParam(required = false) String search,
 
             @Parameter(description = "Page number (0-indexed)")
@@ -102,6 +106,7 @@ public class RoleController {
                 .sortByRole(sortBy)
                 .orderBy(orderBy)
                 .searchTerm(search)
+                .status(status)
                 .build();
         Page<RoleResponse> roles = roleService.searchRoles(roleFilter);
         return responseSupport.success(ResponseData.builder()
@@ -121,6 +126,29 @@ public class RoleController {
                 .isSuccess(true)
                 .httpStatus(HttpStatus.OK.value())
                 .message(MessageConstants.DELETE_ROLE_SUCCESS)
+                .build());
+    }
+
+    @PostMapping("/bulk-delete")
+    @Operation(
+        summary = "Bulk delete roles",
+        description = "Soft delete multiple roles at once. System roles (USER, ADMIN) will be skipped."
+    )
+    public ResponseEntity<ResponseData> bulkDeleteRoles(
+            @Valid @RequestBody BulkDeleteRolesRequest request) {
+        log.info("REST request to bulk delete {} roles", request.getIds().size());
+
+        int deletedCount = roleService.bulkDeleteRoles(request.getIds());
+
+        String message = String.format(
+            "Successfully deleted %d role(s). System roles were skipped if included.",
+            deletedCount
+        );
+
+        return responseSupport.success(ResponseData.builder()
+                .isSuccess(true)
+                .httpStatus(HttpStatus.OK.value())
+                .message(message)
                 .build());
     }
 }

@@ -21,6 +21,7 @@ public class RoleResponse {
     private Instant createdDate;
     private String lastModifiedBy;
     private Instant lastModifiedDate;
+    private Boolean isDelete;
 
     public static RoleResponse mapToResponse(Role role) {
         return RoleResponse.builder()
@@ -31,6 +32,7 @@ public class RoleResponse {
                 .createdDate(role.getCreatedDate())
                 .lastModifiedBy(role.getLastModifiedBy())
                 .lastModifiedDate(role.getLastModifiedDate())
+                .isDelete(role.isDelete())
                 .build();
     }
 }

@@ -14,4 +14,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class RoleFilter extends BaseFilter {
     private SortByRole sortByRole;
+    private Boolean status;
 }

@@ -29,10 +29,10 @@ public class Role extends AbstractAuditingEntity<UUID> implements Serializable {
 
     @NotNull
     @Size(max = 255)
-    @Column(name = "code", length = 255, nullable = false)
+    @Column(name = "code", length = 255, nullable = false, columnDefinition = "VARCHAR(255)")
     private String code;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Override
