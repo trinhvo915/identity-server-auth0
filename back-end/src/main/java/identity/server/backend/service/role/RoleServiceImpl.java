@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -85,8 +86,11 @@ public class RoleServiceImpl implements IRoleService {
     @Override
     @Transactional(readOnly = true)
     public Page<RoleResponse> searchRoles(RoleFilter roleFilter) {
-        log.debug("Searching roles with filter: search='{}', page={}, size={}, sortBy={}, orderBy={}",
+        log.debug("Searching roles with filter: search='{}', status={}, createdDateFrom={}, createdDateTo={}, page={}, size={}, sortBy={}, orderBy={}",
                 roleFilter.getSearchTerm(),
+                roleFilter.getStatus(),
+                roleFilter.getCreatedDateFrom(),
+                roleFilter.getCreatedDateTo(),
                 roleFilter.getPage(),
                 roleFilter.getSize(),
                 roleFilter.getSortByRole(),
@@ -111,7 +115,15 @@ public class RoleServiceImpl implements IRoleService {
             ? searchTerm.trim()
             : null;
 
-        Page<Role> roles = roleRepository.searchRoles(normalizedSearch, pageable);
+        Boolean isDelete = roleFilter.getStatus();
+
+        Page<Role> roles = roleRepository.searchRoles(
+                normalizedSearch,
+                isDelete,
+                roleFilter.getCreatedDateFrom(),
+                roleFilter.getCreatedDateTo(),
+                pageable
+        );
 
         return roles.map(RoleResponse::mapToResponse);
     }
@@ -135,5 +147,30 @@ public class RoleServiceImpl implements IRoleService {
         log.info("Role soft deleted successfully: {}", id);
 
         RoleResponse.mapToResponse(role);
+    }
+
+    @Override
+    @Transactional
+    public int bulkDeleteRoles(List<UUID> ids) {
+        log.info("Bulk deleting {} roles", ids.size());
+
+        // Fetch all roles by IDs
+        List<Role> roles = roleRepository.findAllById(ids);
+
+        // Filter out system roles (USER and ADMIN) and already deleted roles
+        List<Role> rolesToDelete = roles.stream()
+                .filter(role -> !role.getCode().equals("USER") && !role.getCode().equals("ADMIN"))
+                .filter(role -> !role.isDelete())
+                .toList();
+
+        // Soft delete the filtered roles
+        rolesToDelete.forEach(role -> role.setDelete(true));
+        roleRepository.saveAll(rolesToDelete);
+
+        int deletedCount = rolesToDelete.size();
+        log.info("Successfully soft deleted {} role(s). {} role(s) were skipped (system roles or already deleted).",
+                deletedCount, ids.size() - deletedCount);
+
+        return deletedCount;
     }
 }

@@ -9,6 +9,7 @@ import identity.server.backend.service.role.IRoleService;
 import identity.server.backend.model.request.role.CreateRoleRequest;
 import identity.server.backend.model.response.role.RoleResponse;
 import identity.server.backend.model.request.role.UpdateRoleRequest;
+import identity.server.backend.model.request.role.BulkDeleteRolesRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -75,11 +77,21 @@ public class RoleController {
     @GetMapping
     @Operation(
         summary = "Search roles",
-        description = "Search roles by code or description with pagination. Default size is 20, sorted by code ascending."
+        description = "Search roles by code or description with pagination. Default size is 20, sorted by code ascending. " +
+                "Dates should be sent in ISO-8601 format (e.g., 2024-01-01T00:00:00Z). " +
+                "The backend will automatically handle timezone conversion to UTC for database queries."
     )
     public ResponseEntity<ResponseData> searchRoles(
             @Parameter(description = "Search keyword (searches in code and description)")
+            @RequestParam(required = false) Boolean status,
+            @Parameter(description = "Search keyword (searches in code and description)")
             @RequestParam(required = false) String search,
+
+            @Parameter(description = "Filter roles created from this date (ISO-8601 format, e.g., 2024-01-01T00:00:00Z)")
+            @RequestParam(required = false) java.time.Instant createdDateFrom,
+
+            @Parameter(description = "Filter roles created until this date (ISO-8601 format, e.g., 2024-12-31T23:59:59Z)")
+            @RequestParam(required = false) java.time.Instant createdDateTo,
 
             @Parameter(description = "Page number (0-indexed)")
             @RequestParam(defaultValue = "0") int page,
@@ -93,8 +105,8 @@ public class RoleController {
             @Parameter(description = "Sort direction (asc or desc)")
             @RequestParam(required = false, defaultValue = "ASC") Sort.Direction orderBy) {
 
-        log.debug("REST request to search roles: search='{}', page={}, size={}, sort={}",
-                search, page, size, sortBy);
+        log.debug("REST request to search roles: search='{}', createdDateFrom={}, createdDateTo={}, page={}, size={}, sort={}",
+                search, createdDateFrom, createdDateTo, page, size, sortBy);
 
         RoleFilter roleFilter = RoleFilter.builder()
                 .page(page)
@@ -102,6 +114,9 @@ public class RoleController {
                 .sortByRole(sortBy)
                 .orderBy(orderBy)
                 .searchTerm(search)
+                .status(status)
+                .createdDateFrom(createdDateFrom)
+                .createdDateTo(createdDateTo)
                 .build();
         Page<RoleResponse> roles = roleService.searchRoles(roleFilter);
         return responseSupport.success(ResponseData.builder()
@@ -121,6 +136,29 @@ public class RoleController {
                 .isSuccess(true)
                 .httpStatus(HttpStatus.OK.value())
                 .message(MessageConstants.DELETE_ROLE_SUCCESS)
+                .build());
+    }
+
+    @PostMapping("/bulk-delete")
+    @Operation(
+        summary = "Bulk delete roles",
+        description = "Soft delete multiple roles at once. System roles (USER, ADMIN) will be skipped."
+    )
+    public ResponseEntity<ResponseData> bulkDeleteRoles(
+            @Valid @RequestBody BulkDeleteRolesRequest request) {
+        log.info("REST request to bulk delete {} roles", request.getIds().size());
+
+        int deletedCount = roleService.bulkDeleteRoles(request.getIds());
+
+        String message = String.format(
+            "Successfully deleted %d role(s). System roles were skipped if included.",
+            deletedCount
+        );
+
+        return responseSupport.success(ResponseData.builder()
+                .isSuccess(true)
+                .httpStatus(HttpStatus.OK.value())
+                .message(message)
                 .build());
     }
 }

@@ -7,6 +7,7 @@ import identity.server.backend.model.request.role.UpdateRoleRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface IRoleService {
@@ -20,4 +21,6 @@ public interface IRoleService {
     Page<RoleResponse> searchRoles(RoleFilter roleFilter);
 
     void deleteRole(UUID id);
+
+    int bulkDeleteRoles(List<UUID> ids);
 }

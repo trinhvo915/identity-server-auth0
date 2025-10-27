@@ -20,7 +20,7 @@ public class Auth0UserService implements IAuth0UserService {
         String accessToken = baseAuth0.getAccessToken(auth0Config);
 
         Auth0UserResponse response = baseAuth0.executePost(
-                auth0Config.getAuth0Domain() + "/api/v2/users",
+                auth0Config.getAuth0Domain() + "api/v2/users",
                 request,
                 Auth0UserResponse.class,
                 null,

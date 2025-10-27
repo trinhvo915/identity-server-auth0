@@ -19,15 +19,27 @@ public interface RoleRepository extends JpaRepository<Role, UUID> {
     boolean existsByCodeIgnoreCase(String code);
 
     /**
-     * Search roles by code or description with pagination
+     * Search roles by code or description with pagination and status filter
      * @param search Search keyword (searches in both code and description)
+     * @param isDelete Filter by isDelete status (null = all, true = deleted, false = active)
+     * @param createdDateFrom Filter roles created from this date (inclusive, UTC time)
+     * @param createdDateTo Filter roles created until this date (inclusive, UTC time)
      * @param pageable Pagination and sorting info
      * @return Page of roles
      */
     @Query("""
        SELECT r FROM Role r
-       WHERE (:search IS NULL OR LOWER(r.code) LIKE LOWER(CONCAT('%', :search, '%')) 
-              OR LOWER(r.description) LIKE LOWER(CONCAT('%', :search, '%')))
+       WHERE (:search IS NULL OR :search = ''
+              OR LOWER(CAST(r.code AS string)) LIKE LOWER(CONCAT('%', :search, '%'))
+              OR LOWER(CAST(r.description AS string)) LIKE LOWER(CONCAT('%', :search, '%')))
+       AND (:isDelete IS NULL OR r.isDelete = :isDelete)
+       AND (CAST(:createdDateFrom AS java.time.Instant) IS NULL OR r.createdDate >= :createdDateFrom)
+       AND (CAST(:createdDateTo AS java.time.Instant) IS NULL OR r.createdDate <= :createdDateTo)
        """)
-    Page<Role> searchRoles(@Param("search") String search, Pageable pageable);
+    Page<Role> searchRoles(
+        @Param("search") String search,
+        @Param("isDelete") Boolean isDelete,
+        @Param("createdDateFrom") java.time.Instant createdDateFrom,
+        @Param("createdDateTo") java.time.Instant createdDateTo,
+        Pageable pageable);
 }
