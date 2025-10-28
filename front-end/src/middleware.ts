@@ -36,11 +36,13 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    // Protect only root admin page
-    '/admin',
-    // Protect only root dashboard page
-    '/dashboard',
+    // Protect admin pages
+    '/admin/:path*',
+    // Protect dashboard pages
+    '/dashboard/:path*',
     // Protect session page
     '/session',
+    // Protect profile page
+    '/profile',
   ]
 }

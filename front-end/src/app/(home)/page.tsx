@@ -5,11 +5,10 @@ import { useSession } from "next-auth/react";
 import { SongCard, type Song } from "@/components/music/SongCard";
 import { Play, TrendingUp, Clock, ListMusic } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { LoginSection } from "@/components/music/LoginSection";
 import { LockedContent } from "@/components/music/LockedContent";
 
-// Mock data
 const trendingSongs: Song[] = [
   {
     id: "1",
@@ -98,10 +97,8 @@ const Homepage = () => {
 
   const handlePlaySong = (song: Song) => {
     setSelectedSong(song);
-    console.log("Playing:", song.title);
   };
 
-  // Show loading state
   if (status === "loading") {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -114,12 +111,10 @@ const Homepage = () => {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Login Section for Unauthenticated Users */}
+    <div className="container mx-auto space-y-8">
       {!session ? (
         <LoginSection />
       ) : (
-        /* Hero Section for Authenticated Users */
         <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/90 via-primary to-primary/80 p-8 md:p-12 text-primary-foreground">
           <div className="relative z-10 max-w-2xl">
             <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -145,7 +140,6 @@ const Homepage = () => {
         </section>
       )}
 
-      {/* Trending Now */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -175,7 +169,6 @@ const Homepage = () => {
         )}
       </section>
 
-      {/* Recently Played */}
       {session && (
         <section className="space-y-4">
           <div className="flex items-center justify-between">
@@ -194,7 +187,6 @@ const Homepage = () => {
         </section>
       )}
 
-      {/* Popular Playlists */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

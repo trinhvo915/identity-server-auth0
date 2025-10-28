@@ -203,7 +203,9 @@ const AppSidebar = () => {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>Account</DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/profile">Profile</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem>Setting</DropdownMenuItem>
                 <DropdownMenuItem>Sign out</DropdownMenuItem>
               </DropdownMenuContent>

@@ -17,9 +17,11 @@ export default async function RootLayout({
       <SidebarProvider defaultOpen={defaultOpen}>
         <AuthTokenManager />
         <AppSidebar />
-        <main className="w-full">
+        <main className="flex-1 w-full min-w-0 overflow-x-hidden">
           <Navbar />
-          <div className="px-4">{children}</div>
+          <div className="container mx-auto px-4 py-6 max-w-7xl">
+            {children}
+          </div>
         </main>
       </SidebarProvider>
   );

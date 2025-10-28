@@ -39,20 +39,16 @@ export default function RolesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
-  // Pagination state
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
 
-  // Sorting state
   const [sortBy, setSortBy] = useState<"REQUEST_CODE" | "CREATED_DATE" | "LAST_MODIFIED_DATE" | "STATUS">("CREATED_DATE");
   const [orderBy, setOrderBy] = useState<"ASC" | "DESC">("DESC");
 
-  // Status filter state (none = null, active = false, deleted = true)
   const [statusFilter, setStatusFilter] = useState<"none" | "active" | "deleted">("none");
 
-  // Date filter state - separate from and to dates
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
   const [dateTo, setDateTo] = useState<Date | undefined>();
 
@@ -71,13 +67,10 @@ export default function RolesPage() {
     try {
       setLoading(true);
 
-      // none = undefined (null in API), active = false, deleted = true
       const statusParam = statusFilter === "none"
         ? undefined
         : statusFilter === "active" ? false : true;
 
-      // Convert Date to ISO-8601 strings (UTC)
-      // When user selects a date in local time, we convert it to UTC for the API
       const createdDateFrom = dateFrom
         ? new Date(dateFrom.setHours(0, 0, 0, 0)).toISOString()
         : undefined;
@@ -135,12 +128,12 @@ export default function RolesPage() {
 
   const handleDateFromChange = (date: Date | undefined) => {
     setDateFrom(date);
-    setPageIndex(0); // Reset to first page when filter changes
+    setPageIndex(0);
   };
 
   const handleDateToChange = (date: Date | undefined) => {
     setDateTo(date);
-    setPageIndex(0); // Reset to first page when filter changes
+    setPageIndex(0);
   };
 
   const handleSubmit = async (data: CreateRoleRequest) => {
@@ -251,8 +244,7 @@ export default function RolesPage() {
   }, []);
 
   return (
-    <div className="flex-1 space-y-4 p-4 sm:p-6 lg:p-8 pt-4 sm:pt-6">
-      {/* Page Header */}
+    <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">

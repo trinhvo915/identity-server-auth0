@@ -1,16 +1,8 @@
 import { apiClient } from '@/core/utils/configs/axios.config';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-/**
- * Base API Service class
- * Provides common HTTP methods for API calls
- */
 export class ApiService {
-  /**
-   * GET request
-   * @param url - API endpoint
-   * @param config - Optional axios config (params, headers, etc.)
-   */
+
   static async get<T = any>(
     url: string,
     config?: AxiosRequestConfig
@@ -18,12 +10,6 @@ export class ApiService {
     return apiClient.get<T>(url, config);
   }
 
-  /**
-   * POST request
-   * @param url - API endpoint
-   * @param data - Request body
-   * @param config - Optional axios config
-   */
   static async post<T = any>(
     url: string,
     data?: any,
@@ -32,12 +18,6 @@ export class ApiService {
     return apiClient.post<T>(url, data, config);
   }
 
-  /**
-   * PUT request
-   * @param url - API endpoint
-   * @param data - Request body
-   * @param config - Optional axios config
-   */
   static async put<T = any>(
     url: string,
     data?: any,
@@ -46,12 +26,6 @@ export class ApiService {
     return apiClient.put<T>(url, data, config);
   }
 
-  /**
-   * PATCH request
-   * @param url - API endpoint
-   * @param data - Request body
-   * @param config - Optional axios config
-   */
   static async patch<T = any>(
     url: string,
     data?: any,
@@ -60,11 +34,6 @@ export class ApiService {
     return apiClient.patch<T>(url, data, config);
   }
 
-  /**
-   * DELETE request
-   * @param url - API endpoint
-   * @param config - Optional axios config
-   */
   static async delete<T = any>(
     url: string,
     config?: AxiosRequestConfig
@@ -72,10 +41,6 @@ export class ApiService {
     return apiClient.delete<T>(url, config);
   }
 
-  /**
-   * GET request without authentication
-   * Removes Authorization header for public endpoints
-   */
   static async getPublic<T = any>(
     url: string,
     config?: AxiosRequestConfig
@@ -90,10 +55,6 @@ export class ApiService {
     return apiClient.get<T>(url, publicConfig);
   }
 
-  /**
-   * POST request without authentication
-   * Removes Authorization header for public endpoints
-   */
   static async postPublic<T = any>(
     url: string,
     data?: any,
@@ -103,7 +64,7 @@ export class ApiService {
       ...config,
       headers: {
         ...config?.headers,
-        Authorization: undefined, // Remove auth header
+        Authorization: undefined,
       },
     };
     return apiClient.post<T>(url, data, publicConfig);
@@ -153,7 +114,4 @@ export class ApiService {
   }
 }
 
-/**
- * Export the configured axios instance for direct use if needed
- */
 export { apiClient };

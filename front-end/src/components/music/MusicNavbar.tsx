@@ -29,7 +29,6 @@ export function MusicNavbar() {
   };
 
   const handleLogout = async () => {
-    // Complete logout including Auth0 SSO session
     await logout();
   };
 
@@ -37,7 +36,6 @@ export function MusicNavbar() {
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
           <Link href="/" className="flex items-center gap-2 font-bold text-xl">
             <Music2 className="w-8 h-8 text-primary" />
             <span className="hidden sm:inline bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
@@ -61,7 +59,6 @@ export function MusicNavbar() {
             </Link>
           </div>
 
-          {/* Search Bar */}
           <div className="hidden lg:flex flex-1 max-w-md mx-8">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -75,9 +72,7 @@ export function MusicNavbar() {
             </div>
           </div>
 
-          {/* User Menu */}
           <div className="flex items-center gap-2">
-            {/* Theme Switcher */}
             <ThemeSwitcher />
 
             {status === "loading" ? (
@@ -145,7 +140,6 @@ export function MusicNavbar() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t space-y-4">
-            {/* Mobile Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -157,7 +151,6 @@ export function MusicNavbar() {
               />
             </div>
 
-            {/* Mobile Navigation Links */}
             <div className="flex flex-col space-y-2">
               <Link
                 href="/"

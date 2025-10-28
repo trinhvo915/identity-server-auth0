@@ -20,15 +20,6 @@ public class UserSyncService {
     private final IUserService userService;
     private final IAuth0UserService auth0UserService;
 
-    /**
-     * Synchronizes a user with Auth0 in a thread-safe and instance-safe manner
-     * Uses database pessimistic locking to prevent race conditions
-     * @param userId   The user ID to sync
-     * @param email    User email
-     * @param password User password
-     * @param name     User full name
-     * @return The synchronized Auth0UserResponse, or null if user already synced
-     */
     @Transactional(isolation = Isolation.SERIALIZABLE, timeout = 30)
     public Auth0UserResponse syncDefaultUserWithAuth0(UUID userId, String email, String password, String name) {
         try {

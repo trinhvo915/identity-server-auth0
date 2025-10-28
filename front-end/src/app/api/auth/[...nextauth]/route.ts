@@ -26,14 +26,11 @@ export const authOptions: NextAuthOptions = {
             if (account && profile) {
                 token.id = profile.sub || user?.id || '';
 
-                // Store access token from Auth0
                 if (account.access_token) {
                     token.accessToken = account.access_token;
                 }
 
-                // Store id_token for federated logout
                 if (account.id_token) {
-                    // console.log("account.id_token : ", account.id_token)
                     token.idToken = account.id_token;
                 }
 

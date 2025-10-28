@@ -1,5 +1,8 @@
 package identity.server.backend.model.request.role;
 
+import lombok.Getter;
+
+@Getter
 public enum SortByRole {
     REQUEST_CODE("code"),
     CREATED_DATE("createdDate"),
@@ -11,7 +14,4 @@ public enum SortByRole {
         this.field = field;
     }
 
-    public String getField() {
-        return this.field;
-    }
 }

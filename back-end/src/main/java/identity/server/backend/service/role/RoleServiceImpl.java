@@ -4,7 +4,7 @@ import identity.server.backend.domain.Role;
 import identity.server.backend.model.request.role.RoleFilter;
 import identity.server.backend.repository.RoleRepository;
 import identity.server.backend.model.request.role.CreateRoleRequest;
-import identity.server.backend.model.response.role.RoleResponse;
+import identity.server.backend.model.response.Role.RoleResponse;
 import identity.server.backend.model.request.role.UpdateRoleRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

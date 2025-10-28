@@ -13,13 +13,9 @@ export function useAuthToken() {
 
   useEffect(() => {
     if (status === "authenticated" && session?.accessToken) {
-      // Save access token to localStorage
       localStorage.setItem("access_token", session.accessToken);
-      console.log("Access token saved to localStorage");
     } else if (status === "unauthenticated") {
-      // Remove access token from localStorage when user is not authenticated
       localStorage.removeItem("access_token");
-      console.log("Access token removed from localStorage");
     }
   }, [session, status]);
 

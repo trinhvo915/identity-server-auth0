@@ -1,26 +1,30 @@
-package identity.server.backend.model.response.role;
+package identity.server.backend.model.response.Role;
 
 import identity.server.backend.domain.Role;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleResponse {
-    private UUID id;
-    private String code;
+@EqualsAndHashCode(callSuper = true)
+public class RoleResponse extends RoleBaseResponse {
     private String description;
+
     private String createdBy;
+
     private Instant createdDate;
+
     private String lastModifiedBy;
+
     private Instant lastModifiedDate;
+
     private Boolean isDelete;
 
     public static RoleResponse mapToResponse(Role role) {

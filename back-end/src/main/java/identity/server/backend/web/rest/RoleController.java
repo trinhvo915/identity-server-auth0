@@ -7,7 +7,7 @@ import identity.server.backend.model.request.role.RoleFilter;
 import identity.server.backend.model.request.role.SortByRole;
 import identity.server.backend.service.role.IRoleService;
 import identity.server.backend.model.request.role.CreateRoleRequest;
-import identity.server.backend.model.response.role.RoleResponse;
+import identity.server.backend.model.response.Role.RoleResponse;
 import identity.server.backend.model.request.role.UpdateRoleRequest;
 import identity.server.backend.model.request.role.BulkDeleteRolesRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController

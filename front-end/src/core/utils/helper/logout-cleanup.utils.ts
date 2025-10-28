@@ -20,9 +20,6 @@ const AUTH_STORAGE_KEYS = [
   'queue',                  // Current playback queue
 ] as const;
 
-/**
- * Keys that should be preserved (user preferences)
- */
 const PRESERVE_KEYS = [
   'theme',                  // next-themes preference
   'music-app-color-theme',  // Color theme preference
@@ -30,10 +27,6 @@ const PRESERVE_KEYS = [
   'playback_quality',       // Audio quality preference
 ] as const;
 
-/**
- * SAFETY: Backup localStorage data before clearing
- * Returns a backup object that can be used to restore data
- */
 export function backupLocalStorage(): Record<string, string> {
   if (typeof window === 'undefined') return {};
 
@@ -49,7 +42,6 @@ export function backupLocalStorage(): Record<string, string> {
         }
       }
     }
-    console.log('✅ LocalStorage backup created:', Object.keys(backup).length, 'keys');
     return backup;
   } catch (error) {
     console.error('❌ Error creating backup:', error);
@@ -57,9 +49,6 @@ export function backupLocalStorage(): Record<string, string> {
   }
 }
 
-/**
- * SAFETY: Restore localStorage from backup
- */
 export function restoreLocalStorage(backup: Record<string, string>): void {
   if (typeof window === 'undefined') return;
 
@@ -67,7 +56,6 @@ export function restoreLocalStorage(backup: Record<string, string>): void {
     Object.entries(backup).forEach(([key, value]) => {
       localStorage.setItem(key, value);
     });
-    console.log('✅ LocalStorage restored:', Object.keys(backup).length, 'keys');
   } catch (error) {
     console.error('❌ Error restoring backup:', error);
   }
@@ -82,11 +70,9 @@ export function restoreLocalStorage(backup: Record<string, string>): void {
 export function clearAuthData(): Record<string, string> {
   if (typeof window === 'undefined') return {};
 
-  // Create backup before clearing (SAFETY FEATURE)
   const backup: Record<string, string> = {};
 
   try {
-    // Backup only auth keys that will be deleted
     AUTH_STORAGE_KEYS.forEach(key => {
       const value = localStorage.getItem(key);
       if (value) {
@@ -94,16 +80,11 @@ export function clearAuthData(): Record<string, string> {
       }
     });
 
-    // Clear specific auth-related keys
     AUTH_STORAGE_KEYS.forEach(key => {
       localStorage.removeItem(key);
     });
 
-    console.log('✅ Auth data cleared from localStorage');
-    console.log('🔒 User preferences preserved:', PRESERVE_KEYS.join(', '));
-    console.log('💾 Backup available if needed');
-
-    return backup; // Return backup in case of emergency restore
+    return backup;
   } catch (error) {
     console.error('❌ Error clearing auth data:', error);
     return backup;

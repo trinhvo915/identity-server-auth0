@@ -36,7 +36,7 @@ public class SecurityConfiguration {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers("/api/public", API_DOCS, SWAGGER_UI, SWAGGER_UI_HTML).permitAll()
-                .requestMatchers("/api/roles/**").hasAnyAuthority(
+                .requestMatchers("/api/roles/**","/api/users/**").hasAnyAuthority(
                         AuthoritiesConstants.ADMIN
                 )
                 .requestMatchers("/api/private").authenticated()
