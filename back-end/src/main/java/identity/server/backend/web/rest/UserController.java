@@ -5,7 +5,6 @@ import identity.server.backend.framework.support.ResponseSupport;
 import identity.server.backend.model.request.user.CreateUserRequest;
 import identity.server.backend.model.request.user.SortByUser;
 import identity.server.backend.model.request.user.UpdateRoleUserRequest;
-import identity.server.backend.model.request.user.UpdateUserProfileRequest;
 import identity.server.backend.model.request.user.UserFilter;
 import identity.server.backend.model.response.user.UserResponse;
 import identity.server.backend.service.user.IUserService;
@@ -24,8 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -37,7 +34,6 @@ import java.util.UUID;
 @Slf4j
 @Tag(name = "User Management", description = "APIs for user management")
 public class UserController {
-
     private final IUserService userService;
     private final ResponseSupport responseSupport;
 
@@ -275,21 +271,21 @@ public class UserController {
                 .build());
     }
 
-    @GetMapping("/profile")
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    @PutMapping("/{userId}/activate")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(
-        summary = "Get user profile",
-        description = "Get current authenticated user's profile details including roles. Accessible by both USER and ADMIN roles."
+        summary = "Activate user (reactivate deleted user)",
+        description = "Reactivate a soft-deleted user in database (sets isDelete=false, activated=true) and unblocks user in Auth0 (sets blocked=false)"
     )
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
-            description = "User profile retrieved successfully",
+            description = "User activated successfully",
             content = @Content(schema = @Schema(implementation = ResponseData.class))
         ),
         @ApiResponse(
             responseCode = "400",
-            description = "Bad request - user account is deleted",
+            description = "Bad request - user is already active",
             content = @Content(schema = @Schema(implementation = ResponseData.class))
         ),
         @ApiResponse(
@@ -300,59 +296,18 @@ public class UserController {
         @ApiResponse(
             responseCode = "401",
             description = "Unauthorized - authentication required"
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden - requires ADMIN authority"
         )
     })
-    public ResponseEntity<ResponseData> getUserProfile(
-            @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt
+    public ResponseEntity<ResponseData> activateUser(
+            @Parameter(description = "User ID", required = true)
+            @PathVariable UUID userId
     ) {
-        String auth0UserId = jwt.getSubject();
-        log.info("REST request to get user profile for Auth0 user ID: {}", auth0UserId);
-
-        UserResponse response = userService.getUserProfile(auth0UserId);
-        return responseSupport.success(ResponseData.builder()
-                .isSuccess(true)
-                .message(response.getMessage())
-                .data(response)
-                .httpStatus(HttpStatus.OK.value())
-                .build());
-    }
-
-    @PutMapping("/profile")
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    @Operation(
-        summary = "Update user profile",
-        description = "Update current authenticated user's profile (name and password). Updates both database and Auth0. Accessible by both USER and ADMIN roles."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "User profile updated successfully",
-            content = @Content(schema = @Schema(implementation = ResponseData.class))
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Bad request - validation failed, user is deleted, or Auth0 update failed",
-            content = @Content(schema = @Schema(implementation = ResponseData.class))
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "User not found",
-            content = @Content(schema = @Schema(implementation = ResponseData.class))
-        ),
-        @ApiResponse(
-            responseCode = "401",
-            description = "Unauthorized - authentication required"
-        )
-    })
-    public ResponseEntity<ResponseData> updateUserProfile(
-            @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt,
-            @Parameter(description = "User profile update request with name and optional password", required = true)
-            @Valid @RequestBody UpdateUserProfileRequest request
-    ) {
-        String auth0UserId = jwt.getSubject();
-        log.info("REST request to update user profile for Auth0 user ID: {}", auth0UserId);
-
-        UserResponse response = userService.updateUserProfile(auth0UserId, request);
+        log.info("REST request to activate user: {}", userId);
+        UserResponse response = userService.activateUser(userId);
         return responseSupport.success(ResponseData.builder()
                 .isSuccess(true)
                 .message(response.getMessage())

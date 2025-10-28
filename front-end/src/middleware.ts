@@ -14,10 +14,10 @@ export default withAuth(
 
     // Determine if user is authenticated and their role
     const isAuthenticated = !!token;
-    const userRole = token?.role as string | undefined;
+    const userRoles = token?.roles as string[] | undefined;
 
     // Check if redirect is needed based on auth state and role
-    const redirectPath = getRedirectPath(isAuthenticated, userRole, path);
+    const redirectPath = getRedirectPath(isAuthenticated, userRoles, path);
 
     if (redirectPath) {
       return NextResponse.redirect(new URL(redirectPath, req.url));

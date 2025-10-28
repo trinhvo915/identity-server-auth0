@@ -173,4 +173,18 @@ public class RoleServiceImpl implements IRoleService {
 
         return deletedCount;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RoleResponse> getAllActiveRoles() {
+        log.debug("Getting all active roles");
+
+        List<Role> activeRoles = roleRepository.findAllActiveRoles();
+
+        log.info("Found {} active role(s)", activeRoles.size());
+
+        return activeRoles.stream()
+                .map(RoleResponse::mapToResponse)
+                .toList();
+    }
 }

@@ -105,13 +105,31 @@ export const createColumnRoles = (props?: ColumnRolesProps): ColumnDef<Role>[] =
     enableSorting: false,
   },
   {
-    accessorKey: "createdBy",
-    header: "Created By",
-    cell: ({ row }) => (
-      <div className="text-sm text-muted-foreground">
-        {row.getValue("createdBy")}
-      </div>
-    ),
+    accessorKey: "isDelete",
+    header: () => {
+      const isActive = props?.currentSortBy === "STATUS";
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => {
+            const newOrder = isActive && props?.currentOrderBy === "ASC" ? "DESC" : "ASC";
+            props?.onSort?.("STATUS", newOrder);
+          }}
+          className="hover:bg-muted"
+        >
+          Status
+          <ArrowUpDown className={`ml-2 h-4 w-4 ${isActive ? "text-primary" : ""}`} />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const isDelete = row.getValue("isDelete") as boolean;
+      return (
+        <Badge variant={isDelete ? "destructive" : "default"}>
+          {isDelete ? "Deleted" : "Active"}
+        </Badge>
+      );
+    },
     enableSorting: false,
   },
   {
@@ -166,34 +184,6 @@ export const createColumnRoles = (props?: ColumnRolesProps): ColumnDef<Role>[] =
         <div className="text-sm text-muted-foreground">
           {formatUTCToLocal(date, DateFormats.SHORT_DATE_TIME)}
         </div>
-      );
-    },
-    enableSorting: false,
-  },
-  {
-    accessorKey: "isDelete",
-    header: () => {
-      const isActive = props?.currentSortBy === "STATUS";
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => {
-            const newOrder = isActive && props?.currentOrderBy === "ASC" ? "DESC" : "ASC";
-            props?.onSort?.("STATUS", newOrder);
-          }}
-          className="hover:bg-muted"
-        >
-          Status
-          <ArrowUpDown className={`ml-2 h-4 w-4 ${isActive ? "text-primary" : ""}`} />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const isDelete = row.getValue("isDelete") as boolean;
-      return (
-        <Badge variant={isDelete ? "destructive" : "default"}>
-          {isDelete ? "Deleted" : "Active"}
-        </Badge>
       );
     },
     enableSorting: false,

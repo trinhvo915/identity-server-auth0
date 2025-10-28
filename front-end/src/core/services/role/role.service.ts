@@ -5,6 +5,7 @@ import {
   CreateRoleRequest,
   UpdateRoleRequest,
   RoleFilterParams,
+  ActiveRolesResponse,
 } from '@/core/models/role/role.types';
 import {ApiResponse} from "@/core/models/common/model.common";
 
@@ -56,6 +57,13 @@ export class RoleService {
     const response = await ApiService.post<ApiResponse<void>>(
       `${this.BASE_URL}/bulk-delete`,
       { ids }
+    );
+    return response.data;
+  }
+
+  static async getActiveRoles(): Promise<ActiveRolesResponse> {
+    const response = await ApiService.get<ActiveRolesResponse>(
+      `${this.BASE_URL}/active`
     );
     return response.data;
   }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateUserRequest {
+public class CreateUserAuth0Request {
 
     private String email;
 
@@ -52,6 +52,4 @@ public class CreateUserRequest {
 
     @JsonProperty("verify_email")
     private Boolean verifyEmail;
-
-    private String username;
 }

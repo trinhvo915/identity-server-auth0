@@ -7,8 +7,10 @@ import identity.server.backend.framework.constants.MessageConstants;
 import identity.server.backend.framework.exception.BadRequestException;
 import identity.server.backend.framework.exception.NotFoundException;
 import identity.server.backend.framework.thirdparty.auth0.model.Auth0UserResponse;
+import identity.server.backend.framework.thirdparty.auth0.model.CreateUserAuth0Request;
 import identity.server.backend.framework.thirdparty.auth0.model.UpdateUserRequest;
 import identity.server.backend.framework.thirdparty.auth0.service.user.IAuth0UserService;
+import identity.server.backend.model.request.user.CreateUserFromAuth0Request;
 import identity.server.backend.model.request.user.CreateUserRequest;
 import identity.server.backend.model.request.user.UpdateRoleUserRequest;
 import identity.server.backend.model.request.user.UpdateUserProfileRequest;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -102,9 +105,10 @@ public class UserServiceImpl implements IUserService {
         log.info("User saved to database with ID: {}", savedUser.getId());
 
         try {
-            identity.server.backend.framework.thirdparty.auth0.model.CreateUserRequest auth0Request = identity.server.backend.framework.thirdparty.auth0.model.CreateUserRequest.builder()
+            CreateUserAuth0Request auth0Request = CreateUserAuth0Request.builder()
                     .email(request.getEmail())
-                    .username(request.getUsername())
+                    // Don't send username to Auth0 as the connection doesn't support it
+                    // .username(request.getUsername())
                     .password(request.getPassword())
                     .name(request.getName())
                     .givenName(null)
@@ -167,9 +171,8 @@ public class UserServiceImpl implements IUserService {
     }
 
     private void createAuth0UserForReactivation(User user, CreateUserRequest request) {
-        identity.server.backend.framework.thirdparty.auth0.model.CreateUserRequest auth0Request = identity.server.backend.framework.thirdparty.auth0.model.CreateUserRequest.builder()
+       CreateUserAuth0Request auth0Request = CreateUserAuth0Request.builder()
                 .email(user.getEmail())
-                .username(request.getUsername())
                 .password(request.getPassword())
                 .name(request.getName())
                 .givenName(null)
@@ -380,5 +383,70 @@ public class UserServiceImpl implements IUserService {
         }
 
         return UserResponse.mapToUserResponse(savedUser, MessageConstants.UPDATE_USER_SUCCESS);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse activateUser(UUID userId) {
+        log.info("Activating user: {}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(MessageConstants.USER_NOT_FOUND));
+
+        if (!user.isDelete()) {
+            log.warn("User is already active: {}", userId);
+            throw new BadRequestException("User is already active");
+        }
+
+        user.setDelete(false);
+        user.setActivated(true);
+        user.setLastModifiedDate(Instant.now());
+
+        User savedUser = userRepository.save(user);
+        log.info("User activated in database: {}", userId);
+
+        if (user.getAuth0UserId() != null) {
+            try {
+                auth0UserService.blockUser(user.getAuth0UserId(), false);
+                log.info("User unblocked in Auth0: {}", user.getAuth0UserId());
+
+            } catch (Exception e) {
+                log.error("Failed to unblock user in Auth0, but database was updated", e);
+            }
+        } else {
+            log.warn("User has no Auth0 user ID, skipping Auth0 unblock");
+        }
+
+        return UserResponse.mapToUserResponse(savedUser, "User activated successfully.");
+    }
+
+    @Override
+    @Transactional
+    public UserResponse syncUserFromAuth0AndGetRoles(CreateUserFromAuth0Request request) {
+        log.info("Creating user from Auth0 with sub: {}", request.getSub());
+
+        Optional<User> existUser = userRepository.findByAuth0UserIdWithRoles(request.getSub());
+        if (existUser.isPresent()) {
+            log.info("User with Auth0 ID {} already exists, skipping creation", request.getSub());
+            return UserResponse.mapToUserResponse(existUser.get(), MessageConstants.USER_ALREADY_EXISTS);
+        }
+
+        Role userRole = roleRepository.findByCodeIgnoreCase(AuthoritiesConstants.USER)
+                .orElseThrow(() -> new BadRequestException("Default USER role not found"));
+
+        User user = User.builder()
+                .username(request.getEmail())
+                .email(request.getEmail())
+                .name(request.getName())
+                .urlAvatar(request.getPicture())
+                .auth0UserId(request.getSub())
+                .activated(true)
+                .roles(new HashSet<>(Set.of(userRole)))
+                .isDelete(false)
+                .build();
+
+        userRepository.save(user);
+        log.info("User created from Auth0 with ID: {}", user.getId());
+        return UserResponse.mapToUserResponse(user, MessageConstants.CREATE_USER_SUCCESS);
     }
 }

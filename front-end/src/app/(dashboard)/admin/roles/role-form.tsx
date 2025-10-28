@@ -61,6 +61,11 @@ export function RoleForm({
     }
   }, [role, form]);
 
+  // Check if form has changes
+  const hasChanges = role
+    ? form.watch("description") !== role.description
+    : form.watch("code") !== "" || form.watch("description") !== "";
+
   const handleSubmit = async (data: CreateRoleRequest) => {
     try {
       await onSubmit(data);
@@ -158,7 +163,7 @@ export function RoleForm({
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading || !hasChanges}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {role ? "Update" : "Create"}
               </Button>

@@ -1,8 +1,5 @@
 export type UserRole = 'ADMIN' | 'USER' | 'GUEST';
 
-/**
- * Route configuration for role-based access control
- */
 export interface RouteConfig {
   path: string;
   requiredRole?: UserRole;
@@ -50,19 +47,19 @@ export function getRouteConfig(pathname: string): RouteConfig | undefined {
 }
 
 export function hasRequiredRole(
-  userRole: string | undefined,
+  userRoles: string[] | undefined,
   requiredRole: UserRole | undefined
 ): boolean {
-  // If no role required, allow access
   if (!requiredRole) return true;
 
-  // Check if user has the required role
-  return userRole === requiredRole;
+  if (!userRoles || userRoles.length === 0) return false;
+
+  return userRoles.includes(requiredRole);
 }
 
 export function getRedirectPath(
   isAuthenticated: boolean,
-  userRole: string | undefined,
+  userRoles: string[] | undefined,
   targetPath: string
 ): string | null {
   const routeConfig = getRouteConfig(targetPath);
@@ -73,7 +70,7 @@ export function getRedirectPath(
     return '/access-denied';
   }
 
-  if (routeConfig.requiredRole && !hasRequiredRole(userRole, routeConfig.requiredRole)) {
+  if (routeConfig.requiredRole && !hasRequiredRole(userRoles, routeConfig.requiredRole)) {
     return '/access-denied';
   }
 

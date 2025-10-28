@@ -4,6 +4,7 @@ import identity.server.backend.domain.User;
 import identity.server.backend.model.request.user.CreateUserRequest;
 import identity.server.backend.model.request.user.UpdateRoleUserRequest;
 import identity.server.backend.model.request.user.UpdateUserProfileRequest;
+import identity.server.backend.model.request.user.CreateUserFromAuth0Request;
 import identity.server.backend.model.request.user.UserFilter;
 import identity.server.backend.model.response.user.UserResponse;
 import org.springframework.data.domain.Page;
@@ -28,4 +29,8 @@ public interface IUserService {
     UserResponse getUserDetail(UUID userId);
 
     UserResponse updateUserProfile(String auth0UserId, UpdateUserProfileRequest request);
+
+    UserResponse activateUser(UUID userId);
+
+    UserResponse syncUserFromAuth0AndGetRoles(CreateUserFromAuth0Request request);
 }
