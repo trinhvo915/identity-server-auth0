@@ -2,7 +2,7 @@ package identity.server.backend.service.sync;
 
 import identity.server.backend.domain.User;
 import identity.server.backend.framework.thirdparty.auth0.model.Auth0UserResponse;
-import identity.server.backend.framework.thirdparty.auth0.model.CreateUserRequest;
+import identity.server.backend.framework.thirdparty.auth0.model.CreateUserAuth0Request;
 import identity.server.backend.framework.thirdparty.auth0.service.user.IAuth0UserService;
 import identity.server.backend.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class UserSyncService {
                 return null;
             }
 
-            CreateUserRequest request = buildCreateUserRequest(email, password, name);
+            CreateUserAuth0Request request = buildCreateUserRequest(email, password, name);
             Auth0UserResponse auth0Response = auth0UserService.createUser(request);
 
             log.info("User created in Auth0. Auth0UserId: {}", auth0Response.getUserId());
@@ -55,8 +55,8 @@ public class UserSyncService {
         }
     }
 
-    private CreateUserRequest buildCreateUserRequest(String email, String password, String name) {
-        return CreateUserRequest.builder()
+    private CreateUserAuth0Request buildCreateUserRequest(String email, String password, String name) {
+        return CreateUserAuth0Request.builder()
                 .email(email)
                 .password(password)
                 .name(name)

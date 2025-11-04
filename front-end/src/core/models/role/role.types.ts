@@ -14,6 +14,8 @@ export type RoleListResponse = ApiResponse<PageResponse<Role>>;
 
 export type RoleResponse = ApiResponse<Role>;
 
+export type ActiveRolesResponse = ApiResponse<Role[]>;
+
 export interface CreateRoleRequest {
   code: string;
   description: string;

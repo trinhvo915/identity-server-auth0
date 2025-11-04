@@ -29,26 +29,26 @@ public class SecurityConfiguration {
     @Value("${okta.oauth2.audience}")
     private String audience;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-            .cors(Customizer.withDefaults())
-            .csrf(AbstractHttpConfigurer::disable)
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+            return http
+                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers("/api/public", API_DOCS, SWAGGER_UI, SWAGGER_UI_HTML).permitAll()
                 .requestMatchers("/api/roles/**","/api/users/**").hasAnyAuthority(
-                        AuthoritiesConstants.ADMIN
+                    AuthoritiesConstants.ADMIN
                 )
-                .requestMatchers("/api/private").authenticated()
+                .requestMatchers("/api/profile/**").authenticated()
             )
-            .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt
-                    .decoder(jwtDecoder())
-                    .jwtAuthenticationConverter(jwtAuthenticationConverter)
+                .oauth2ResourceServer(oauth2 -> oauth2
+                    .jwt(jwt -> jwt
+                        .decoder(jwtDecoder())
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter)
+                    )
                 )
-            )
-            .build();
-    }
+                .build();
+        }
 
     @Bean
     public JwtDecoder jwtDecoder() {

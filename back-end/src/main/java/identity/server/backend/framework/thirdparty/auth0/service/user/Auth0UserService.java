@@ -2,7 +2,7 @@ package identity.server.backend.framework.thirdparty.auth0.service.user;
 
 import identity.server.backend.framework.thirdparty.auth0.model.Auth0M2MConfig;
 import identity.server.backend.framework.thirdparty.auth0.model.Auth0UserResponse;
-import identity.server.backend.framework.thirdparty.auth0.model.CreateUserRequest;
+import identity.server.backend.framework.thirdparty.auth0.model.CreateUserAuth0Request;
 import identity.server.backend.framework.thirdparty.auth0.model.UpdateUserRequest;
 import identity.server.backend.framework.thirdparty.auth0.service.base.IBaseAuth0;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class Auth0UserService implements IAuth0UserService {
     private final Auth0M2MConfig auth0Config;
 
     @Override
-    public Auth0UserResponse createUser(CreateUserRequest request) {
+    public Auth0UserResponse createUser(CreateUserAuth0Request request) {
         log.info("Creating user with email: {}", request.getEmail());
         String accessToken = baseAuth0.getAccessToken(auth0Config);
 

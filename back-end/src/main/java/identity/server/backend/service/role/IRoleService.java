@@ -22,4 +22,6 @@ public interface IRoleService {
     void deleteRole(UUID id);
 
     int bulkDeleteRoles(List<UUID> ids);
+
+    List<RoleResponse> getAllActiveRoles();
 }

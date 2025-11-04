@@ -43,7 +43,6 @@ export function MusicNavbar() {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
               <Home className="w-4 h-4" />
@@ -103,7 +102,7 @@ export function MusicNavbar() {
                       Profile
                     </Link>
                   </DropdownMenuItem>
-                  {session.user?.role === "ADMIN" && (
+                  {session.user?.roles?.includes("ADMIN") && (
                     <DropdownMenuItem asChild>
                       <Link href="/admin" className="flex items-center">
                         <span className="w-4 h-4 mr-2">⚙️</span>

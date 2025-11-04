@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -135,6 +136,24 @@ public class RoleController {
                 .isSuccess(true)
                 .httpStatus(HttpStatus.OK.value())
                 .message(MessageConstants.DELETE_ROLE_SUCCESS)
+                .build());
+    }
+
+    @GetMapping("/active")
+    @Operation(
+        summary = "Get all active roles",
+        description = "Retrieve all roles that are not soft-deleted (isDelete = false), sorted by code ascending"
+    )
+    public ResponseEntity<ResponseData> getAllActiveRoles() {
+        log.debug("REST request to get all active roles");
+
+        List<RoleResponse> activeRoles = roleService.getAllActiveRoles();
+
+        return responseSupport.success(ResponseData.builder()
+                .isSuccess(true)
+                .httpStatus(HttpStatus.OK.value())
+                .data(activeRoles)
+                .message(String.format("Found %d active role(s)", activeRoles.size()))
                 .build());
     }
 

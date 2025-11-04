@@ -7,7 +7,6 @@ import { ShieldAlert, Home, ArrowLeft, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
-// Force dynamic rendering to avoid pre-rendering issues with useSession
 export const dynamic = 'force-dynamic';
 
 export default function AccessDeniedPage() {
@@ -50,7 +49,7 @@ export default function AccessDeniedPage() {
                     Current Role
                   </p>
                   <span className="inline-flex items-center px-3 py-1 rounded-full bg-background border border-border text-xs font-semibold shadow-sm">
-                    {session.user.role || "USER"}
+                    {session.user.roles?.join(", ") || "USER"}
                   </span>
                 </div>
               </div>
@@ -65,7 +64,6 @@ export default function AccessDeniedPage() {
               </div>
             )}
 
-            {/* Show if user is authenticated but lacks permission */}
             {isAuthenticated && (
               <div className="bg-amber-500/10 dark:bg-amber-500/5 rounded-xl p-4 border border-amber-500/20">
                 <p className="text-sm text-foreground/80 leading-relaxed">
@@ -81,7 +79,6 @@ export default function AccessDeniedPage() {
 
           <CardFooter className="flex flex-col sm:flex-row gap-3 pt-6 px-6 pb-6">
             {!isAuthenticated ? (
-              // Show login button if not authenticated
               <>
                 <Link href="/" className="w-full sm:w-auto order-2 sm:order-1">
                   <Button variant="outline" className="w-full">
@@ -98,7 +95,6 @@ export default function AccessDeniedPage() {
                 </Button>
               </>
             ) : (
-              // Show navigation buttons if authenticated
               <>
                 <Button
                   variant="outline"

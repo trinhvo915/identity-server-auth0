@@ -100,13 +100,8 @@ export function DataTable<TData, TValue>({
       .getFilteredSelectedRowModel()
       .rows.map((row) => row.original);
 
-    // Filter out system roles (USER and ADMIN) from deletion
-    const deletableRows = selectedRows.filter((row: any) => {
-      return row.code !== "USER" && row.code !== "ADMIN";
-    });
-
-    if (onDeleteSelected && deletableRows.length > 0) {
-      onDeleteSelected(deletableRows);
+    if (onDeleteSelected && selectedRows.length > 0) {
+      onDeleteSelected(selectedRows);
     }
   };
 
@@ -118,7 +113,7 @@ export function DataTable<TData, TValue>({
           {/* Search Input */}
           <div className="relative w-full lg:max-w-md">
             <Input
-              placeholder="Search by code or description..."
+              placeholder="Search by email or username..."
               value={searchValue}
               onChange={(event) => onSearchChange?.(event.target.value)}
               className="w-full pr-10"

@@ -1,5 +1,8 @@
 import NextAuth, { NextAuthOptions } from "next-auth"
 import Auth0Provider from "next-auth/providers/auth0";
+import { apiClient } from '@/core/utils/configs/axios.config';
+import {UserProfileService} from "@/core/services/user/user-profile.service";
+import {CreateUserFromAuth0Request} from "@/core/models/user/user.types";
 
 export const authOptions: NextAuthOptions = {
     session: {
@@ -21,22 +24,52 @@ export const authOptions: NextAuthOptions = {
         })
     ],
     callbacks: {
-        async jwt({token, profile, account, user}) {
-            // Initial sign in
+        async signIn({ user, account, profile }) {
             if (account && profile) {
+                try {
+                    if (account.access_token) {
+                        apiClient.defaults.headers.common.Authorization = `Bearer ${account.access_token}`;
+                    }
+
+                    const createUserRequest: CreateUserFromAuth0Request = {
+                        sub: profile.sub as string,
+                        email: profile.email,
+                        name: profile?.name,
+                        picture: user?.image
+                    };
+
+                    const response = await UserProfileService.syncUserFromAuth0AndGetRoles(createUserRequest);
+                    console.log("response : ", response)
+                    if (response.data.roles && response.data.roles.length > 0) {
+                        user.roles = response.data.roles.map(role => role.code);
+                    }
+
+                    return true;
+                } catch (error) {
+                    console.error("Failed to create user from Auth0:", error);
+                    return false;
+                }
+            }
+            return true;
+        },
+        async jwt({token, profile, account, user}) {
+            if (account && profile && user) {
                 token.id = profile.sub || user?.id || '';
 
                 if (account.access_token) {
                     token.accessToken = account.access_token;
+                    apiClient.defaults.headers.common.Authorization = `Bearer ${account.access_token}`;
                 }
 
                 if (account.id_token) {
                     token.idToken = account.id_token;
                 }
 
-                // TODO: Get role from Auth0 user metadata or database
-                // For now, hard code role as ADMIN
-                token.role = 'ADMIN';
+                if (user.roles) {
+                    token.roles = user.roles;
+                } else {
+                    token.roles = [];
+                }
             }
 
             return token;
@@ -44,10 +77,8 @@ export const authOptions: NextAuthOptions = {
         async session({session, token}) {
             if (token && session.user) {
                 session.user.id = token.id as string;
-                session.user.role = token.role as string;
-                // Pass access token to client-side session
+                session.user.roles = token.roles as string[];
                 session.accessToken = token.accessToken as string;
-                // Pass id_token for logout
                 session.idToken = token.idToken as string;
             }
             return session;
@@ -55,17 +86,11 @@ export const authOptions: NextAuthOptions = {
     },
     events: {
         async signOut({ token }) {
-            // Federated logout: redirect to Auth0 logout endpoint
-            // This will clear the Auth0 SSO session
             if (token?.idToken) {
                 const issuerUrl = process.env.AUTH0_ISSUER!;
                 const logoutUrl = new URL(`${issuerUrl}/v2/logout`);
                 logoutUrl.searchParams.set('client_id', process.env.AUTH0_CLIENT_ID!);
                 logoutUrl.searchParams.set('returnTo', process.env.NEXTAUTH_URL!);
-
-                // Note: The redirect happens on client side via signOut({ callbackUrl })
-                // This event just logs the logout
-                console.log('User signed out, Auth0 session should be cleared');
             }
         }
     },
